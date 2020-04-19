@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
 {
     printf("Radius(1~50):");
     scanf("%d", &R);
-	if (R < 1)
+	if (R < 1 || R > 50)
 		return 0;
 
 	glutInit(&argc, argv);
@@ -53,18 +53,18 @@ void keyboard_callback(unsigned char k, int x, int y)
 	if (k == 27)
 		exit(0);
 }
-void DrawCircle(int xc, int yc, int r)
+void DrawCircle(int r)
 {
-    float x = r, y = 0, eps = 1.0/(float)r, x1, y1;
-	glBegin(GL_POINTS);
-    glVertex2i(r, 0);
-	do {
-        x1 = x + y * eps;
-		y1 = y - eps * x1;
-		glVertex2i(xc + (int)x1, yc - (int)y1);
-		x = x1;
-		y = y1;
-	} while (y < eps || (r - x) > eps);
-	glEnd();
-	glFlush();
+	float x, x1, y, y1, eps;
+	x = (float)r;
+	y = 0.0f;
+	eps = 1.0f / (float)r;
+LOOP:
+	SetPixel((int)x, (int)y);
+	x1 = x;
+	y1 = y;
+	x = x1 - y1 * eps;
+	y = y1 + x * eps;
+	if (abs(y) > eps || abs(r - x) > eps)
+		goto LOOP;
 }

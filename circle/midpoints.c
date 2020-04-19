@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
 {
     printf("Radius(1~50):");
     scanf("%d", &R);
-	if (R < 1)
+	if (R < 1 || R > 50)
 		return 0;
 
 	glutInit(&argc, argv);
@@ -73,7 +73,12 @@ void DrawH(int y, int left, int right)
 }
 void DrawCircle(int R)
 {
-	int x = 0, x0 = 0, y = R, D = 1 - R, E = 3;
+	int x, x0, y, D, E;
+	x = 0;
+	x0 = 0;
+	y = R;
+	D = 1 - R;
+	E = 3;
 REPEAT:
 	while (D < 0)
 	{

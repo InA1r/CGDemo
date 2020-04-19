@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
 {
     printf("Radius(1~50):");
     scanf("%d", &R);
-	if (R < 1)
+	if (R < 1 || R > 50)
 		return 0;
 
 	glutInit(&argc, argv);
@@ -69,7 +69,9 @@ void DrawPixel(int x, int y)
 }
 void DrawCirle(int r)
 {
-	int d, x = 0, y = r;
+	int d, x, y;
+	x = 0;
+	y = r;
 	r = r * r;
 	while (x <= y)
 	{

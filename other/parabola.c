@@ -11,7 +11,7 @@ void Parabola(float p, int maxX, int maxY);
 int main(int argc, char ** argv)
 {
     int ret;
-	printf("抛物线焦准距：\n");
+	printf("抛物线焦准距(1~50为宜)：\n");
 	ret = scanf("%f", &p);
 	if (ret != 1 || p <= 0)
 	{

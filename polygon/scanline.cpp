@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 #include "def.h"
 
@@ -15,12 +16,14 @@ std::vector<EDGE> myAET;
 
 void SetPixelH(int y, GLfloat left, GLfloat right)
 {
+    int L, R;
+    L = (int)roundf(left);
+    R = (int)roundf(right);
+    if(L < left)  L++;
+    if(R > right) R--;
     glBegin(GL_POINTS);
-    while (left <= right)
-    {
-        glVertex2i((int)(left + 0.5f), y);
-        left++;
-    }
+    while(L <= R)
+        glVertex2i(L++, y);
     glEnd();
     glFlush();
 }
@@ -46,6 +49,10 @@ int DrawPolygon()
         std::sort(myAET.begin(), myAET.end(), CompMinX);
         for (auto k = myAET.begin(); k != myAET.end();)
         {
+            //
+            // 尚未解决的、繁琐的问题：
+            // 扫描过程中扫描线与水平边重合时，不能得到正确的填充区间，从而遗漏某一段像素
+            //
             if (k->yMax != i)
             {
                 cnt++;
@@ -238,10 +245,11 @@ void BuildNET(const std::vector<POINT> &apt, std::vector<EDGE> &net)
     for (i = 1; i < sz; i++)
     {
         j = apt[i].y - apt[i - 1].y;
+
+        // 上述BUG的根源在这里（水平边）：
         if (j == 0)
-        {
             continue;
-        }
+
         if (j < 0)
         {
             edge.yMin = apt[i].y;
@@ -266,7 +274,7 @@ void BuildNET(const std::vector<POINT> &apt, std::vector<EDGE> &net)
         DBG_PRNT("BUILD EDGE:  yMin=%d  <xOfMinY=%.1f, delta=%.2f, yMax=%d>\n",
                  edge.yMin, edge.xOfMinY, edge.deltaX, edge.yMax);
     }
-    DBG_PRNT("TOTAL BUILD %d EDGE(S)\n", sz);
+    DBG_PRNT("BUILD %d EDGE(S)\n", sz);
 }
 int main(int argc, char *argv[])
 {

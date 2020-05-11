@@ -1,0 +1,82 @@
+// 把坐标系转换成“x↑ o →y”的形式
+static XFORM xform = { 1, 0, 0, -1, 0, 0 };
+SetGraphicsMode(hdc, GM_ADVANCED);
+SetWorldTransform(hdc, &xform);
+
+// 把坐标原点放在客户区的中央
+GetClientRect(hWnd, &rc);
+midX = (rc.right - rc.left)/2.0;
+midY = (rc.bottom - rc.top)/2.0;
+SetViewportOrgEx(hdc, midX, midY, NULL);
+
+// 算法代码：
+VOID ScanlineFill(HDC hdc, int x, int y, COLORREF _old, COLORREF _new)
+{
+	POINT pt;
+	BOOL needFill;
+	int xL, xR;
+	std::stack<POINT> st;
+
+	st.push({ x, y });
+	while (!st.empty())
+	{
+		pt = st.top();
+		st.pop();
+		x = pt.x;
+		y = pt.y;
+		while (GetPixel(hdc, x, y) == _old)
+		{
+			SetPixel(hdc, x, y, _new);
+			x++;
+		}
+		xR = x - 1;							// get xL
+		x = pt.x - 1;
+		while (GetPixel(hdc, x, y) == _old)
+		{
+			SetPixel(hdc, x, y, _new);
+			x--;
+		}
+		xL = x + 1;							// get xR
+
+		y = y + 1;
+		for (x = xL; x <= xR; )
+		{
+			needFill = FALSE;
+			while (GetPixel(hdc, x, y) == _old)
+			{
+				needFill = TRUE;
+				x++;
+			}
+			if (needFill)
+			{
+				st.push({ x - 1, y });
+				needFill = FALSE;
+			}
+			while (GetPixel(hdc, x, y) != _old && x <= xR)
+			{
+				x++;
+			}
+		}
+
+		y -= 2;
+		for (x = xL; x <= xR; )
+		{
+			needFill = FALSE;
+			while (GetPixel(hdc, x, y) == _old)
+			{
+				needFill = TRUE;
+				x++;
+			}
+			if (needFill)
+			{
+				st.push({x - 1, y});
+				needFill = FALSE;
+			}
+			while (GetPixel(hdc, x, y) != _old && x <= xR)
+			{
+				x++;
+			}
+		}
+
+	}
+}

@@ -1,0 +1,59 @@
+// 把坐标系转换成“x↑ o →y”的形式
+static XFORM xform = { 1, 0, 0, -1, 0, 0 };
+SetGraphicsMode(hdc, GM_ADVANCED);
+SetWorldTransform(hdc, &xform);
+
+// 把坐标原点放在客户区的中央
+GetClientRect(hWnd, &rc);
+midX = (rc.right - rc.left)/2.0;
+midY = (rc.bottom - rc.top)/2.0;
+SetViewportOrgEx(hdc, midX, midY, NULL);
+
+// 填充边界表示的区域
+VOID MyFloodFill4(HDC hdc, int x, int y, COLORREF boundaryColor, COLORREF newColor)
+{
+	COLORREF color = GetPixel(hdc, x, y);
+	if (color != newColor && color != boundaryColor)
+	{
+		SetPixel(hdc, x, y, newColor);
+		MyFloodFill4(hdc, x, y + 1, boundaryColor, newColor);
+		MyFloodFill4(hdc, x, y - 1, boundaryColor, newColor);
+		MyFloodFill4(hdc, x + 1, y, boundaryColor, newColor);
+		MyFloodFill4(hdc, x - 1, y, boundaryColor, newColor);
+	}
+}
+
+// 填充点阵表示的区域
+VOID MyFloodFill4(HDC hdc, int x, int y, COLORREF _old, COLORREF _new)
+{
+	if (GetPixel(hdc, x, y) == _old)
+	{
+		SetPixel(hdc, x, y, _new);
+		MyFloodFill4(hdc, x, y + 1, _old, _new);
+		MyFloodFill4(hdc, x, y - 1, _old, _new);
+		MyFloodFill4(hdc, x + 1, y, _old, _new);
+		MyFloodFill4(hdc, x - 1, y, _old, _new);
+	}
+}
+
+// 填充边界表示的区域（不使用栈内存）
+VOID MyFloodFill4(HDC hdc, int x, int y, COLORREF _old, COLORREF _new)
+{
+	std::stack<POINT> stk;
+	POINT pt;
+	stk.push({x, y});
+	while (!stk.empty())
+	{
+		pt = stk.top();
+		stk.pop();
+		if (GetPixel(hdc, pt.x, pt.y) == _old)
+		{
+			SetPixel(hdc, pt.x, pt.y, _new);
+			stk.push({ pt.x, pt.y - 1 });
+			stk.push({ pt.x + 1, pt.y });
+			stk.push({ pt.x, pt.y + 1 });
+			stk.push({ pt.x - 1, pt.y });
+		}
+		// else: do nothing
+	}
+}

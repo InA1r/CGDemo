@@ -41,20 +41,20 @@ void display_callback()
 
 void BresenhamLine(int x0, int y0, int x1, int y1)
 {
-    int x, y, e, dx, dy;
+	int x, y, e, dx, dy;
 	dx = x1 - x0;
-    dy = y1 - y0;
+	dy = y1 - y0;
 	x = x0;
-    y = y0;
-    e = -dx;
+	y = y0;
+	e = -dx;
 	glBegin(GL_POINTS);
 	for (int i = 0; i <= dx; i++)
-    {
-	    glVertex2i(x, y);
+	{
+		glVertex2i(x, y);
 		x++;
 		e += 2*dy;
 		if (e >= 0)
-        {
+		{
 			y++;
 			e -= 2*dx;
 		}

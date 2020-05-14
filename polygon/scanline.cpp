@@ -17,7 +17,7 @@ std::vector<EDGE> myAET;
 void SetPixelH(int y, GLfloat left, GLfloat right)
 {
     int L, R;
-    L = (int)roundf(left);
+    L = (int)roundf(left);  // (int)(x+0.5f)这种方法只对正数有效
     R = (int)roundf(right);
     if(L < left)  L++;
     if(R > right) R--;
@@ -35,11 +35,10 @@ int DrawPolygon()
 {
     int i, j, netSize, cnt;
     float xL;
-    i = bottomY;
     j = 0;
-    netSize = (int)myNET.size();
     cnt = 0;
-    for (; i <= topY; i++)
+    netSize = (int)myNET.size();
+    for (i = bottomY; i <= topY; i++)
     {
         while (j < netSize && i == myNET[j].yMin)
         {
@@ -108,11 +107,13 @@ void display_callback()
     glEnd();
     glFlush();
 }
+// 按下ESC键退出
 void keyboard_callback(unsigned char k, int x, int y)
 {
     if (k == 27)
         exit(0);
 }
+// 从文件中读取多边形的各个定点（只认识数字）
 void BuildPT(const char *ptFile, std::vector<POINT> &apt)
 {
     int x, y, ch, ret, cnt;
@@ -246,7 +247,7 @@ void BuildNET(const std::vector<POINT> &apt, std::vector<EDGE> &net)
     {
         j = apt[i].y - apt[i - 1].y;
 
-        // 上述BUG的根源在这里（水平边）：
+        // 为了方便，我没有把水平边加入到表中，这导致了上述BUG（上面的代码本身也有问题）
         if (j == 0)
             continue;
 
@@ -284,7 +285,8 @@ int main(int argc, char *argv[])
     i = (int)myNET.size();
     if (i == 0)
     {
-        printf("It mustn't be all horizontal lines.");
+        // 所有边都是水平的
+        printf("Invalid shape.");
         return -1;
     }
     bottomY = myNET[0].yMin;

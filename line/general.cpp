@@ -11,8 +11,8 @@ const int WND_HEIGHT = 600;
 const float ORTHO_H = 50.0f;
 const float ORTHO_V = 50.0f;
 
-int startX, startY;
-int targetX, targetY;
+static int startX, startY;
+static int targetX, targetY;
 
 void DisplayCallback();
 void KeyBoardCallback(unsigned char k, int x, int y);
@@ -28,9 +28,9 @@ int main(int argc, char** argv)
 	std::cin >> startX >> startY >> targetX >> targetY;
 	
 	if(!InRange(startX, -ORTHO_H, ORTHO_H)
-		&& InRange(startY, -ORTHO_V, ORTHO_V)
-		&& InRange(targetX, -ORTHO_H, ORTHO_H)
-		&& InRange(targetX, -ORTHO_V, ORTHO_V)
+		|| !InRange(startY, -ORTHO_V, ORTHO_V)
+		|| !InRange(targetX, -ORTHO_H, ORTHO_H)
+		|| !InRange(targetX, -ORTHO_V, ORTHO_V)
 	) {
 		exit(1);
 	}
